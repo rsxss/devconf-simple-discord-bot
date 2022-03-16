@@ -8,11 +8,13 @@ import requests
 
 from fastapi import FastAPI
 from azure.keyvault.secrets import SecretClient
+from azure.identity import DefaultAzureCredential
 
 key_vault_name = os.environ["KEY_VAULT_NAME"]
 key_vault_uri = f"https://{key_vault_name}.vault.azure.net"
 
-vault_client = SecretClient(vault_url=key_vault_uri)
+credential = DefaultAzureCredential()
+vault_client = SecretClient(vault_url=key_vault_uri, credential=credential)
 
 cat_apikey = vault_client.get_secret('cat-apikey')
 bot_token = vault_client.get_secret('discord-bot-token')
