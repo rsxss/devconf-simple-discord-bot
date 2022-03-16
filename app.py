@@ -47,11 +47,9 @@ api = FastAPI(docs_url=None)
 client = DiscordClient()
 
 
-@api.on_event('startup')
-async def startup_event():
-    asyncio.create_task(client.start(bot_token))
-
-
 @api.get('/')
 async def health_check():
     return {'status': 'OK'}
+
+asyncio.create_task(client.start(bot_token))
+
