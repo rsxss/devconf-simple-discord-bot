@@ -21,7 +21,7 @@ jobs:
         username: ${{ secrets.REGISTRY_USERNAME }}
         password: ${{ secrets.REGISTRY_PASSWORD }}
     - run: |
-        docker build . -t devconfregistry.azurecr.io/xyz-ym-simple-discord-bot:${{ github.sha }}
+        docker build . --build-arg VAULT_NAME=${{ secrets.AZURE_KEYVAULT_NAME }} -t devconfregistry.azurecr.io/xyz-ym-simple-discord-bot:${{ github.sha }}
         docker push devconfregistry.azurecr.io/xyz-ym-simple-discord-bot:${{ github.sha }}     
       
     - uses: azure/webapps-deploy@v2
