@@ -1,5 +1,5 @@
 fastapi==0.75.0
-discord.py[voice]
+discord.py[voice]==1.7.3
 uvicorn==0.17.6
 requests==2.27.1
 azure-identity==1.8.0
