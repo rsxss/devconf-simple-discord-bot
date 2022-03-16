@@ -55,6 +55,3 @@ async def startup_event():
 @api.get('/')
 async def health_check():
     return {'status': 'OK'}
-
-asyncio.create_task(client.start(bot_token))
-
