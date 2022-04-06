@@ -16,8 +16,8 @@ key_vault_uri = f"https://{key_vault_name}.vault.azure.net"
 credential = DefaultAzureCredential()
 vault_client = SecretClient(vault_url=key_vault_uri, credential=credential)
 
-cat_apikey = vault_client.get_secret('cat-apikey')
-bot_token = vault_client.get_secret('discord-bot-token')
+cat_apikey = vault_client.get_secret('cat-apikey').value
+bot_token = vault_client.get_secret('discord-bot-token').value
 
 cat_api = 'https://api.thecatapi.com/v1/images'
 
