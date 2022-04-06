@@ -6,5 +6,5 @@ RUN python3 -m pip install -r requirements.txt
 
 ENV KEY_VAULT_NAME=$VAULT_NAME
 
-CMD ["app:api", "--port=$PORT"]
+CMD app:api --port=$PORT
 ENTRYPOINT ["python3", "-m", "uvicorn"]
