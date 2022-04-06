@@ -6,5 +6,5 @@ RUN python3 -m pip install -r requirements.txt
 
 ENV KEY_VAULT_NAME=$VAULT_NAME
 
-CMD ["-b", "0.0.0.0:80"]
-ENTRYPOINT ["gunicorn", "app:api", "-w", "1", "-k", "uvicorn.workers.UvicornWorker"]
+CMD ["app:api", "-b", "0.0.0.0:$PORT"]
+ENTRYPOINT ["python", "-m", "uvicorn"]

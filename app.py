@@ -3,12 +3,13 @@
 import os
 import asyncio
 
-import discord
-import requests
+import aiohttp
 
 from fastapi import FastAPI
+from discord.ext import commands
 from azure.keyvault.secrets import SecretClient
 from azure.identity import DefaultAzureCredential
+
 
 key_vault_name = os.environ["KEY_VAULT_NAME"]
 key_vault_uri = f"https://{key_vault_name}.vault.azure.net"
@@ -19,42 +20,58 @@ vault_client = SecretClient(vault_url=key_vault_uri, credential=credential)
 cat_apikey = vault_client.get_secret('cat-apikey')
 bot_token = vault_client.get_secret('discord-bot-token')
 
+cat_api = 'https://api.thecatapi.com/v1/images'
+
 headers = {
     'x-api-key': cat_apikey
 }
 
 
-class DiscordClient(discord.Client):
+class DiscordBot(commands.Bot):
+
+    def __init__(self, command_prefix='!', *args, **kwargs):
+        super().__init__(command_prefix=command_prefix, *args, **kwargs)
 
     async def on_ready(self):
         print('Logged on as', self.user)
 
-    async def on_message(self, message):
-        # don't respond to ourselves
-        if message.author == self.user:
-            return
+    def default_commands(self):
+        @commands.command(name='ping')
+        async def _bc_ping(ctx):
+            await ctx.send('pong')
 
-        if message.content == 'ping':
-            await message.channel.send('pong')
+        @commands.command(name='cat')
+        async def _bc_cat(ctx):
+            async with global_session.get(f'{cat_api}/search', headers=headers) as resp:
+                await ctx.send((await resp.json(encoding='utf-8'))[0]['url'])
 
-        if message.content == 'cat':
-            resp = requests.get('https://api.thecatapi.com/v1/images/search', headers=headers).json()
-            await message.channel.send(resp[0])
+        return [_command for _command in locals().values() if isinstance(_command, commands.Command)]
+
+    def add_command(self, *_commands):
+        if not _commands:
+            _commands = self.default_commands()
+
+        for _command in _commands:
+            print(f'Added command <{_command}>')
+            super().add_command(_command)
+
+        return True
 
 
 api = FastAPI(docs_url=None)
 
-client = DiscordClient()
+bot = DiscordBot()
+bot.add_command()
+
+global_event_loop = asyncio.get_running_loop()
+global_session = aiohttp.ClientSession()
 
 
 @api.on_event('startup')
 async def startup_event():
-    asyncio.create_task(client.start(bot_token))
+    asyncio.create_task(bot.start(bot_token))
 
 
 @api.get('/')
 async def health_check():
     return {'status': 'OK'}
-
-asyncio.create_task(client.start(bot_token))
-
