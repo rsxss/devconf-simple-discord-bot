@@ -56,7 +56,7 @@ class DiscordBot(commands.Bot):
 
 api = FastAPI(docs_url=None)
 
-bot = DiscordBot()
+bot = DiscordBot(loop=asyncio.get_event_loop())
 bot.add_command()
 
 global_event_loop = asyncio.get_running_loop()
