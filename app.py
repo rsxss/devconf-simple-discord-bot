@@ -2,13 +2,15 @@
 
 import os
 import asyncio
+import threading
+
 import aiohttp
+import uvicorn
 
 from fastapi import FastAPI
 from discord.ext import commands
 from azure.keyvault.secrets import SecretClient
 from azure.identity import DefaultAzureCredential
-
 
 key_vault_name = os.environ["KEY_VAULT_NAME"]
 key_vault_uri = f"https://{key_vault_name}.vault.azure.net"
@@ -54,19 +56,22 @@ class DiscordBot(commands.Bot):
         return True
 
 
+def keep_alive():
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    uvicorn.run('app:api', host='0.0.0.0', port=8080, log_level='info')
+
+
 api = FastAPI(docs_url=None)
-
-bot = DiscordBot()
-bot.add_command()
-
-global_session = aiohttp.ClientSession()
-
-
-@api.on_event('startup')
-async def startup_event():
-    asyncio.create_task(bot.start(bot_token))
 
 
 @api.get('/')
 async def health_check():
     return {'status': 'OK'}
+
+
+global_session = aiohttp.ClientSession()
+web = threading.Thread(target=keep_alive)
+web.start()
+bot = DiscordBot()
+bot.add_command()
+bot.run(bot_token)
