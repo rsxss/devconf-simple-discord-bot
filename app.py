@@ -2,7 +2,6 @@
 
 import os
 import asyncio
-
 import aiohttp
 
 from fastapi import FastAPI
@@ -31,9 +30,6 @@ class DiscordBot(commands.Bot):
 
     def __init__(self, command_prefix='!', *args, **kwargs):
         super().__init__(command_prefix=command_prefix, *args, **kwargs)
-
-    async def on_ready(self):
-        print('Logged on as', self.user)
 
     def default_commands(self):
         @commands.command(name='ping')
