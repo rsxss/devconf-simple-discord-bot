@@ -58,7 +58,7 @@ class DiscordBot(commands.Bot):
 
 def keep_alive():
     asyncio.set_event_loop(asyncio.new_event_loop())
-    uvicorn.run('app:api', host='0.0.0.0', port=8080, log_level='info')
+    uvicorn.run('app:api', host='0.0.0.0', port=os.environ.get('WEBSITES_PORT', 8000), log_level='info')
 
 
 api = FastAPI(docs_url=None)
@@ -75,3 +75,4 @@ web.start()
 bot = DiscordBot()
 bot.add_command()
 bot.run(bot_token)
+global_session.close()
