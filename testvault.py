@@ -11,7 +11,7 @@ client = SecretClient(vault_url=KVUri, credential=credential)
 secretName = input("Input a name for your secret > ")
 secretValue = input("Input a value for your secret > ")
 
-print(f"Creating a secret in {keyVaultName} called '{secretName}' with the value '{secretValue}' ...")
+# print(f"Creating a secret in {keyVaultName} called '{secretName}' with the value '{secretValue}' ...")
 
 client.set_secret(secretName, secretValue)
 
